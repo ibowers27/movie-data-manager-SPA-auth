@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { validateLogin } from "./authenticator";
+// Firebase authentication using google auth
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+// Added: Firebase app instance from your initialized config
+import { app } from "../firebase/firebase.js";
 
 export default function Authenticator() {
   // useState hooks to track user input and login status
@@ -10,6 +14,9 @@ export default function Authenticator() {
   const [displayName, setDisplayName] = useState("");
 
   const audioRef = React.useRef(null);
+  //Google provider
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
   // Handle login with username and password
   function handleLogin(interactedTarget) {
@@ -25,19 +32,29 @@ export default function Authenticator() {
     }
   }
 
-  // Handle Google login shortcut
-  function handleGoogleLogin(interactedTarget) {
+  //Google popup auth
+  async function handleGoogleLogin(interactedTarget) {
     interactedTarget.preventDefault();
-    const result = validateLogin("google", "");
-    alert(result.message);
-    if (result.Login) {
+    try {
+      // pop up using google provider authenticator 
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
       setIsLoggedIn(true);
-      setDisplayName("Logged in with Google");
+      setDisplayName(user.displayName || "Google User");
+      console.log("Logged in user:", user);
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      alert("Failed to login with Google: " + error.message);
     }
   }
 
   // Reset fields on logout
-  function handleLogout() {
+  async function handleLogout() {
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore sign out errors and still reset local state
+    }
     setIsLoggedIn(false);
     setUsername("");
     setPassword("");
