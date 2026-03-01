@@ -115,7 +115,7 @@ export default function Authenticator() {
               onChange={(e) => setEmail(e.target.value)}
             />
             <p className="text-xs text-base-content/50 mt-1">
-              Use your Firebase Auth email
+              Enter your email
             </p>
           </li>
 
@@ -129,7 +129,7 @@ export default function Authenticator() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <p className="text-xs text-base-content/50 mt-1">
-              Must be at least 6 characters
+              Password Must be at least 6 characters
             </p>
           </li>
 
@@ -142,13 +142,13 @@ export default function Authenticator() {
           <li className="mt-3">
             <div className="grid grid-cols-2 gap-2">
               <button
-                className="btn btn-ghost border border-base-300 w-full"
+                className="btn btn-ghost border border-base-300 w-full active:bg-neutral active:text-neutral-content active:border-neutral"
                 onClick={handleRegister}
               >
                 Register
               </button>
               <button
-                className="btn btn-ghost border border-base-300 w-full"
+                className="btn btn-ghost border border-base-300 w-full active:bg-neutral active:text-neutral-content active:border-neutral"
                 onClick={handleResetPassword}
               >
                 Reset Password
