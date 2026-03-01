@@ -1,42 +1,66 @@
 import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
-import { validateLogin } from "./authenticator";
-// Firebase authentication using google auth
+import { loginWithEmail, registerWithEmail, resetPasswordWithEmail } from "./auth";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-// Added: Firebase app instance from your initialized config
 import { app } from "../firebase/firebase.js";
 
 export default function Authenticator() {
-  // useState hooks to track user input and login status
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [displayName, setDisplayName] = useState("");
 
   const audioRef = React.useRef(null);
-  //Google provider
+
+  // Firebase Auth instance and Google provider
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Handle login with username and password
-  function handleLogin(interactedTarget) {
+  // Email/password login
+  async function handleLogin(interactedTarget) {
     interactedTarget.preventDefault();
-    const result = validateLogin(username, password);
-    alert(result.message);
-    if (result.Login) {
+    const result = await loginWithEmail(email, password);
+    if (result.success) {
       setIsLoggedIn(true);
-      setDisplayName(username);
-      if (username === "thien" && password === "thien" && audioRef.current) {
-        audioRef.current.play();
-      }
+      setDisplayName(result.user.email || "Email User");
+      alert("Login successful");
+    } else {
+      alert(result.message);
     }
   }
 
-  //Google popup auth
+  // Email/password registration
+  async function handleRegister(interactedTarget) {
+    interactedTarget.preventDefault();
+    const result = await registerWithEmail(email, password);
+    if (result.success) {
+      setIsLoggedIn(true);
+      setDisplayName(result.user.email || "Email User");
+      alert("Registration successful");
+    } else {
+      alert(result.message);
+    }
+  }
+
+  async function handleResetPassword(interactedTarget) {
+    interactedTarget.preventDefault();
+    if (!email) {
+      alert("Please enter your email first.");
+      return;
+    }
+
+    const result = await resetPasswordWithEmail(email);
+    if (result.success) {
+      alert("Password reset email sent.");
+    } else {
+      alert(result.message);
+    }
+  }
+
+  // Google popup authentication
   async function handleGoogleLogin(interactedTarget) {
     interactedTarget.preventDefault();
     try {
-      // pop up using google provider authenticator 
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setIsLoggedIn(true);
@@ -48,18 +72,16 @@ export default function Authenticator() {
     }
   }
 
-  // Reset fields on logout
   async function handleLogout() {
     try {
       await signOut(auth);
     } catch {
-      // ignore sign out errors and still reset local state
+      
     }
     setIsLoggedIn(false);
-    setUsername("");
+    setEmail("");
     setPassword("");
     setDisplayName("");
-    //stop and restart audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -68,40 +90,36 @@ export default function Authenticator() {
 
   let content;
   if (isLoggedIn) {
-    // Logged-in view: display name + logout button
     content = (
       <>
         <span className="font-semibold mr-3">{displayName}</span>
-        {/* btn-error = dark red (#7f2d31) */}
         <button className="btn bg-[#be9859] text-white" onClick={handleLogout}>
           Logout
         </button>
       </>
     );
   } else {
-    // Logged-out view: profile icon dropdown with login form
     content = (
       <details className="dropdown dropdown-end">
         <summary className="btn btn-square btn-ghost">
-          {/* Profile icon instead of hamburger menu */}
           <FaUserCircle className="text-2xl" />
         </summary>
         <ul className="menu dropdown-content bg-base-100 rounded-box z-10 w-80 p-4 shadow-sm mt-2">
-          {/* Username input */}
+          
           <li className="mb-3">
             <input
-              type="text"
+              type="email"
               className="input w-full"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <p className="text-xs text-base-content/50 mt-1">
-              Must be at least 5 characters
+              Use your Firebase Auth email
             </p>
           </li>
 
-          {/* Password input */}
+          
           <li className="mb-3">
             <input
               type="password"
@@ -111,18 +129,33 @@ export default function Authenticator() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <p className="text-xs text-base-content/50 mt-1">
-              Must be at least 5 characters
+              Must be at least 6 characters
             </p>
           </li>
 
-          {/* Login button */}
           <li>
             <button className="btn bg-[#be9859] w-full" onClick={handleLogin}>
               Log in
             </button>
           </li>
 
-          {/* Google login */}
+          <li className="mt-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                className="btn btn-ghost border border-base-300 w-full"
+                onClick={handleRegister}
+              >
+                Register
+              </button>
+              <button
+                className="btn btn-ghost border border-base-300 w-full"
+                onClick={handleResetPassword}
+              >
+                Reset Password
+              </button>
+            </div>
+          </li>
+
           <li className="mt-3">
             <button
               className="btn btn-ghost border border-base-300 w-full"
