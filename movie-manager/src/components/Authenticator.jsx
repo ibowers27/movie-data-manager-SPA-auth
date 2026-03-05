@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
-import { loginWithEmail, registerWithEmail, resetPasswordWithEmail } from "./auth";
+import { loginWithEmail, registerWithEmail, resetPasswordWithEmail } from "../firebase/auth.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { app } from "../firebase/firebase.js";
 
@@ -75,8 +75,9 @@ export default function Authenticator() {
   async function handleLogout() {
     try {
       await signOut(auth);
-    } catch {
-      
+    } catch (error) {
+      console.error("Google sign-out error:", error);
+      alert("Failed to sign out: " + error.message);
     }
     setIsLoggedIn(false);
     setEmail("");

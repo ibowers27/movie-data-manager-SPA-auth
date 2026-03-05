@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "./navbar";
+import Navbar from "./Navbar";
 
 // header wrap for the navbar and background boarder
 const Header = ({ sidebarView, onSidebarToggle }) => {
