@@ -5,9 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 // Custom hooks
-import useMovieData from "./hooks/FetchMovies";
-import useMovieInteractions from "./hooks/MovieInteractions";
-import useMovieFilters from "./hooks/MovieFilters";
+import useMovieData from "./hooks/useFetchMovies";
+import useMovieInteractions from "./hooks/useMovieInteractions";
+import useMovieFilters from "./hooks/useMovieFilters";
 
 // Components
 import Header from "./components/header";

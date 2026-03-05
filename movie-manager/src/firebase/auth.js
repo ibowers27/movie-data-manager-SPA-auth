@@ -4,7 +4,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { app } from "../firebase/firebase.js";
+import { app } from "./firebase.js";
 
 const auth = getAuth(app);
 
