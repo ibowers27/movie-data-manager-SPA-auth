@@ -10,11 +10,11 @@ import useMovieInteractions from "./hooks/useMovieInteractions";
 import useMovieFilters from "./hooks/useMovieFilters";
 
 // Components
-import Header from "./components/header";
-import FilterBar from "./components/Filterbar";
-import MovieList from "./components/movielist";
-import BodyPiece from "./components/body";
-import Footer from "./components/footer";
+import Header from "./components/Header";
+import FilterBar from "./components/FilterBar";
+import MovieList from "./components/MovieList";
+import BodyPiece from "./components/Body";
+import Footer from "./components/Footer";
 
 const App = () => {
   const { movies } = useMovieData();
