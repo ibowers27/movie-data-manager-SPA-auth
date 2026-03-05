@@ -10,6 +10,7 @@ function MovieCard({
   onToggleWatchlist,
   onToggleLike,
   onToggleDislike,
+  isGuest = false,
 }) {
   const audioYesRef = useRef(null);
   const audioNoRef = useRef(null);
@@ -38,11 +39,12 @@ function MovieCard({
         {/* Header row: title + watchlist heart */}
         <div className="flex items-start justify-between gap-2">
           <h2 className="card-title text-lg leading-tight">{movie.title}</h2>
-          <button
-            className="btn btn-ghost btn-sm text-lg shrink-0"
-            onClick={() => onToggleWatchlist(movie.title)}
-            aria-label={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
-            title={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
+          {!isGuest && (
+            <button
+              className="btn btn-ghost btn-sm text-lg shrink-0"
+              onClick={() => onToggleWatchlist(movie.title)}
+              aria-label={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
+              title={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
           >
             {/* text-[#7f2d31] = dark red when watchlisted */}
             {isWatchlisted ? (
@@ -51,6 +53,7 @@ function MovieCard({
               <FaRegHeart />
             )}
           </button>
+          )}
         </div>
 
         {/* Metadata badges */}
@@ -90,11 +93,12 @@ function MovieCard({
           </div>
 
           {/* Like / Dislike buttons */}
-          <div className="flex gap-1">
-            {/* btn-success (green) when liked, btn-ghost when not */}
-            <button
-              className={`btn btn-sm ${isLiked ? "btn-success" : "btn-ghost"}`}
-              onClick={() => handleLikeClick(movie.title)}
+          {!isGuest && (
+            <div className="flex gap-1">
+              {/* btn-success (green) when liked, btn-ghost when not */}
+              <button
+                className={`btn btn-sm ${isLiked ? "btn-success" : "btn-ghost"}`}
+                onClick={() => handleLikeClick(movie.title)}
               aria-label={isLiked ? "Remove like" : "Like"}
               title={isLiked ? "Remove like" : "Like"}
             >
@@ -126,6 +130,7 @@ function MovieCard({
             />
             
           </div>
+          )}
         </div>
       </div>
     </div>

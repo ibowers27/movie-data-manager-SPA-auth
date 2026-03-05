@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function MovieFilters(movies) {
+export default function useMovieFilters(movies) {
   const [filterGenre, setFilterGenre] = useState("all");
   const [filterAgeGroup, setFilterAgeGroup] = useState("all");
   const [filterYear, setFilterYear] = useState("all");

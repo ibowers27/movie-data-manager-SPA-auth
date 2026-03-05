@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export default function MovieInteractions() {
+export default function useMovieInteractions() {
   const [watchlist, setWatchlist] = useState([]);
   const [liked, setLiked] = useState([]);
   const [disliked, setDisliked] = useState([]);

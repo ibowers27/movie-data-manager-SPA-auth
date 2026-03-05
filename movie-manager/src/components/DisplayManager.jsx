@@ -1,5 +1,5 @@
 import React from "react";
-import ExportCSV from "./export.jsx";
+import ExportCSV from "./Export.jsx";
 
 function WatchlistPanel({ items, onRemove, allMovies }) {
   return (
