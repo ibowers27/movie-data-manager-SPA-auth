@@ -9,6 +9,9 @@ This website is a personal movie manager built with Vite, React, React Router, a
 https://movieweek5ncf.web.app 
 
 
+## State-Action Diagram
+![State-Action Diagram](movie-manager/src/assets/movie-manager-state-diagram.png)
+
 ### Routing:
 - **MainRoute.jsx**: Central router config that defines all app routes
   - `/ (Home)`: Guest landing page with site preview and limited filtering
