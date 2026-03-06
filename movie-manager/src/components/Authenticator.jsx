@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import { loginWithEmail, registerWithEmail, resetPasswordWithEmail } from "../firebase/auth.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebase.js";
@@ -10,6 +10,8 @@ export default function Authenticator() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const audioRef = React.useRef(null);
 
@@ -25,6 +27,21 @@ export default function Authenticator() {
     return () => unsubscribe();
   }, [auth]);
 
+  useEffect(() => {
+    if (!isModalOpen) {
+      return undefined;
+    }
+
+    function handleEsc(event) {
+      if (event.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isModalOpen]);
+
   // Email/password login
   async function handleLogin(interactedTarget) {
     interactedTarget.preventDefault();
@@ -32,8 +49,10 @@ export default function Authenticator() {
     if (result.success) {
       alert("Login successful");
       navigate("/dashboard");
+      setIsModalOpen(false);
       setEmail("");
       setPassword("");
+      setShowPassword(false);
     } else {
       alert(result.message);
     }
@@ -46,8 +65,10 @@ export default function Authenticator() {
     if (result.success) {
       alert("Registration successful");
       navigate("/dashboard");
+      setIsModalOpen(false);
       setEmail("");
       setPassword("");
+      setShowPassword(false);
     } else {
       alert(result.message);
     }
@@ -74,9 +95,11 @@ export default function Authenticator() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      setIsLoggedIn(true);
       navigate("/dashboard");
-      setDisplayName(user.displayName || "Google User");
+      setIsModalOpen(false);
+      setEmail("");
+      setPassword("");
+      setShowPassword(false);
       console.log("Logged in user:", user);
     } catch (error) {
       console.error("Google sign-in error:", error);
@@ -91,12 +114,13 @@ export default function Authenticator() {
       console.error("Google sign-out error:", error);
       alert("Failed to sign out: " + error.message);
     }
-    setIsLoggedIn(false);
     setEmail("");
     setPassword("");
-    setDisplayName("");
-    if (audioRef.current) {
+    setShowPassword(false);
+    setIsModalOpen(false);
     navigate("/");
+
+    if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
@@ -114,72 +138,120 @@ export default function Authenticator() {
     );
   } else {
     content = (
-      <details className="dropdown dropdown-end">
-        <summary className="btn btn-square btn-ghost">
+      <>
+        <button
+          type="button"
+          className="btn btn-square btn-ghost"
+          aria-haspopup="dialog"
+          aria-expanded={isModalOpen}
+          aria-controls="auth-modal"
+          onClick={() => setIsModalOpen(true)}
+        >
           <FaUserCircle className="text-2xl" />
-        </summary>
-        <ul className="menu dropdown-content bg-base-100 rounded-box z-10 w-80 p-4 shadow-sm mt-2">
-          
-          <li className="mb-3">
-            <input
-              type="email"
-              className="input w-full"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <p className="text-xs text-base-content/50 mt-1">
-              Enter your email
-            </p>
-          </li>
+        </button>
 
-          
-          <li className="mb-3">
-            <input
-              type="password"
-              className="input w-full"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <p className="text-xs text-base-content/50 mt-1">
-              Password Must be at least 6 characters
-            </p>
-          </li>
-
-          <li>
-            <button className="btn bg-[#be9859] w-full" onClick={handleLogin}>
-              Log in
-            </button>
-          </li>
-
-          <li className="mt-3">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                className="btn btn-ghost border border-base-300 w-full active:bg-neutral active:text-neutral-content active:border-neutral"
-                onClick={handleRegister}
-              >
-                Register
-              </button>
-              <button
-                className="btn btn-ghost border border-base-300 w-full active:bg-neutral active:text-neutral-content active:border-neutral"
-                onClick={handleResetPassword}
-              >
-                Reset Password
-              </button>
-            </div>
-          </li>
-
-          <li className="mt-3">
-            <button
-              className="btn btn-ghost border border-base-300 w-full"
-              onClick={handleGoogleLogin}
+        {isModalOpen && (
+          <div
+            id="auth-modal"
+            className="fixed inset-0 z-50 overflow-y-auto bg-black/40 px-3 py-6 sm:py-10"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-modal-label"
+            onClick={() => setIsModalOpen(false)}
+          >
+            <div
+              className="mx-auto w-full max-w-lg"
+              onClick={(event) => event.stopPropagation()}
             >
-              Login with Google
-            </button>
-          </li>
-        </ul>
-      </details>
+              <div className="flex flex-col rounded-xl border border-base-300 bg-base-100 shadow-xl">
+                <div className="flex items-center justify-between border-b border-base-300 px-4 py-3">
+                  <h3 id="auth-modal-label" className="font-semibold text-base-content">
+                    Account Access
+                  </h3>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-circle btn-ghost"
+                    aria-label="Close"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    x
+                  </button>
+                </div>
+
+                <div className="max-h-[65vh] space-y-4 overflow-y-auto p-4">
+                  <div>
+                    <label htmlFor="auth-email" className="mb-2 block text-sm text-base-content">
+                      Email
+                    </label>
+                    <input
+                      id="auth-email"
+                      type="email"
+                      className="input input-bordered w-full"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="auth-password" className="mb-2 block text-sm text-base-content">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="auth-password"
+                        type={showPassword ? "text" : "password"}
+                        className="input input-bordered w-full pr-12"
+                        placeholder="Enter password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-base-content/70 hover:text-base-content"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                    <p className="mt-1 text-xs text-base-content/60">Password must be at least 6 characters.</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 border-t border-base-300 px-4 py-3">
+                  <button type="button" className="btn bg-[#be9859] text-white" onClick={handleLogin}>
+                    Log in
+                  </button>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      className="btn btn-ghost border border-base-300"
+                      onClick={handleRegister}
+                    >
+                      Register
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost border border-base-300"
+                      onClick={handleResetPassword}
+                    >
+                      Reset Password
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-ghost border border-base-300"
+                    onClick={handleGoogleLogin}
+                  >
+                    Login with Google
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
