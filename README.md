@@ -3,10 +3,26 @@
 ###
 Teammates: Ivy Bowers, Thien Ong, Angelo Morelli
 
-This website is a personal movie manager made with Vite, React, and JavaScript. Minimal CSS is used, as our goal was to approach the project from a Utility-First perspective using TailwindCSS and DaisyUI. 
+This website is a personal movie manager built with Vite, React, React Router, and Firebase Authentication. The app features utility-first styling using TailwindCSS and DaisyUI with a complete role-based routing system for authenticated and guest users.
 
 ## Live Link:
-https://goldenreel.netlify.app/
+https://movieweek5ncf.web.app 
+
+
+### Routing:
+- **MainRoute.jsx**: Central router config that defines all app routes
+  - `/ (Home)`: Guest landing page with site preview and limited filtering
+  - `/dashboard`: Full movie management interface (req. auth)
+  - `/unauthorized`: 401 error page for unauthed access attempts
+  - `*`: 404 for undefined routes
+- **PrivateRoute.jsx**: Component protecting authenticated routes using Firebase auth state
+
+### Authentication:
+- Authentication using Firebase
+- Email/password registration and login
+- Google OAuth popup login via Firebase
+- Real-time auth state syncing across all components using `onAuthStateChanged()`
+- **Authenticator.jsx**: Firebase-integrated auth UI that syncs with live auth state; displays logout button when user is authenticated
 
 ### Major Sections in the page:
 - Component-based implementation (authenticator, body, displaymanager, export, filterbar, footer, header, moviecard, movielist, navbar) to keep App.jsx as clean as possible.
