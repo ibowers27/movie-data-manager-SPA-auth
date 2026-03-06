@@ -8,10 +8,20 @@ import NotFound from "../pages/NotFound";
 import Unauthorized from "../pages/Unauthorized";
 import PrivateRoute from "./PrivateRoute";
 
-export default function MainRoute({}) {
+export default function MainRoute({ user }) {
   return (
     <Routes>
-      
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute user={user}>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { loginWithEmail, registerWithEmail, resetPasswordWithEmail } from "../firebase/auth.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/firebase.js";
 
 export default function Authenticator() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [displayName, setDisplayName] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
   const audioRef = React.useRef(null);
 
@@ -16,14 +17,23 @@ export default function Authenticator() {
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
+  // Listen to Firebase auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, [auth]);
+
   // Email/password login
   async function handleLogin(interactedTarget) {
     interactedTarget.preventDefault();
     const result = await loginWithEmail(email, password);
     if (result.success) {
-      setIsLoggedIn(true);
-      setDisplayName(result.user.email || "Email User");
       alert("Login successful");
+      navigate("/dashboard");
+      setEmail("");
+      setPassword("");
     } else {
       alert(result.message);
     }
@@ -34,9 +44,10 @@ export default function Authenticator() {
     interactedTarget.preventDefault();
     const result = await registerWithEmail(email, password);
     if (result.success) {
-      setIsLoggedIn(true);
-      setDisplayName(result.user.email || "Email User");
       alert("Registration successful");
+      navigate("/dashboard");
+      setEmail("");
+      setPassword("");
     } else {
       alert(result.message);
     }
@@ -64,6 +75,7 @@ export default function Authenticator() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setIsLoggedIn(true);
+      navigate("/dashboard");
       setDisplayName(user.displayName || "Google User");
       console.log("Logged in user:", user);
     } catch (error) {
@@ -84,16 +96,17 @@ export default function Authenticator() {
     setPassword("");
     setDisplayName("");
     if (audioRef.current) {
+    navigate("/");
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
   }
 
   let content;
-  if (isLoggedIn) {
+  if (currentUser) {
     content = (
       <>
-        <span className="font-semibold mr-3">{displayName}</span>
+        <span className="font-semibold mr-3">{currentUser.displayName || currentUser.email}</span>
         <button className="btn bg-[#be9859] text-white" onClick={handleLogout}>
           Logout
         </button>
