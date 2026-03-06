@@ -74,10 +74,10 @@ export default function Authenticator() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      setIsLoggedIn(true);
-      navigate("/dashboard");
-      setDisplayName(user.displayName || "Google User");
       console.log("Logged in user:", user);
+      navigate("/dashboard");
+      setEmail("");
+      setPassword("");
     } catch (error) {
       console.error("Google sign-in error:", error);
       alert("Failed to login with Google: " + error.message);
@@ -91,15 +91,13 @@ export default function Authenticator() {
       console.error("Google sign-out error:", error);
       alert("Failed to sign out: " + error.message);
     }
-    setIsLoggedIn(false);
     setEmail("");
     setPassword("");
-    setDisplayName("");
     if (audioRef.current) {
-    navigate("/");
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+    navigate("/");
   }
 
   let content;
