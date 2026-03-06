@@ -95,12 +95,18 @@ export default function Authenticator() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+<<<<<<< HEAD
       navigate("/dashboard");
       setIsModalOpen(false);
       setEmail("");
       setPassword("");
       setShowPassword(false);
+=======
+>>>>>>> 1e2db9014f3516ecd2fd2cdf070f2412c3359d0f
       console.log("Logged in user:", user);
+      navigate("/dashboard");
+      setEmail("");
+      setPassword("");
     } catch (error) {
       console.error("Google sign-in error:", error);
       alert("Failed to login with Google: " + error.message);
@@ -116,14 +122,18 @@ export default function Authenticator() {
     }
     setEmail("");
     setPassword("");
+<<<<<<< HEAD
     setShowPassword(false);
     setIsModalOpen(false);
     navigate("/");
 
+=======
+>>>>>>> 1e2db9014f3516ecd2fd2cdf070f2412c3359d0f
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+    navigate("/");
   }
 
   let content;
